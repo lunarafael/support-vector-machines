@@ -10,6 +10,6 @@ Este repositório tem como objetivo proporcionar uma visão abrangente sobre SVM
 
 Para facilitar a navegação e o aprendizado, o repositório está organizado em pastas temáticas:
 
-- **/conceitos**: Explicações detalhadas sobre os conceitos fundamentais do SVM.
+- **/teoria**: Explicações detalhadas sobre os conceitos fundamentais do SVM.
 - **/aplicacoes**: Exemplos práticos e códigos de implementação em Python.
 - **/guia**: Conjuntos de dados e resultados de experimentos.
