@@ -12,6 +12,8 @@ No campo da **Aprendizagem de Máquina**, o conceito de **hiperplanos de separa�
 
 Um **hiperplano** é uma generalização geométrica de uma linha reta. No caso de um espaço bidimensional, um hiperplano é uma linha reta que divide o espaço em duas regiões. Em um espaço tridimensional, é um plano, e em espaços de dimensões superiores, é chamado de hiperplano.
 
+![Hiperplano](./images/hiperplano.png)
+
 Matematicamente, um hiperplano pode ser descrito pela equação:
 
 w * x  + b = 0
@@ -36,16 +38,19 @@ Se um conjunto de dados pode ser perfeitamente separado por um hiperplano, ele �
 
 ---
 
-## Margem Máxima
+## Margens
 
-### O que é Margem?
+- **Margem**: Distância entre o hiperplano separador e o ponto de dado mais próximo.
+- **Margem Máxima**: O hiperplano é ajustado para maximizar essa distância, garantindo a melhor separação possível entre as classes.
 
-### Margem Máxima
+![Margens](./images/margem.png)
 
 ### Benefícios da Margem Máxima
 
 - **Generalização**: Um hiperplano com maior margem tem maior probabilidade de generalizar melhor para novos dados, evitando o overfitting.
 - **Robustez**: Maximizar a margem também aumenta a robustez da classificação, minimizando o impacto de ruídos ou dados atípicos.
+
+Maximizar a margem significa minimizar a possibilidade de erro na classificação de novos dados, já que o hiperplano está o mais distante possível dos pontos mais próximos.
 
 ---
 
@@ -75,3 +80,7 @@ A combinação desses conceitos faz com que o SVM seja amplamente utilizado em a
 
 
 ## Referências
+- [Support Vector Machine - Diego Addan](https://www.inf.ufpr.br/dagoncalves/IA07.pdf)
+- [Modelos de Vetores de Suporte - Anderson Ara, Raydonal Ospina e Mateus Maia](http://leg.ufpr.br/~ara/teach/svm/01_introducao.html#ref-evgeniou2002regularization)
+- [Máquina de Vetores de Suporte — SVM - Matheus Remigio](https://medium.com/@msremigio/m%C3%A1quinas-de-vetores-de-suporte-svm-77bb114d02fc)
+- [Guide on Support Vector Machine (SVM) Algorithm](https://www.analyticsvidhya.com/support-vector-machine/)	
