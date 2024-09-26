@@ -60,6 +60,8 @@ Maximizar a margem significa minimizar a possibilidade de erro na classificaçã
 
 Os **vetores de suporte** são os pontos de dados que estão mais próximos do hiperplano de separação. Esses pontos são os que determinam a posição do hiperplano e, portanto, a solução final do SVM depende exclusivamente desses vetores de suporte.
 
+![Vetores de Suporte](support.png)
+
 ### Utilidade dos Vetores de Suporte
 
 1. **Determinam o Hiperplano**: O hiperplano de separação é definido diretamente pelos vetores de suporte. Se removêssemos outros pontos, o hiperplano não mudaria.
