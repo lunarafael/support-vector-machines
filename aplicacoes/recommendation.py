@@ -34,9 +34,10 @@ class App(tk.Tk):
         dados = response.json()
         self.dados = dados.copy()
         self.modelo_svm = None
-        self.predicoes = None
+        self.predicoes = []
         self.accuracia = 0
         self.criado = False
+        self.lista_thumbs = ['https://www.freetogame.com/g/582/thumbnail.jpg']
     # Dicionário para armazenar as telas
         self.frames = {}
 
@@ -61,17 +62,55 @@ class TelaRecomendado(tk.Frame):
         super().__init__(parent)
         self.parent = parent
         self.controller = controller
-        pass
+
+        # Inicializar o índice para o carrossel
+        self.thumb_index = 0
+
+        # Label para mostrar a imagem
+        self.img_label = tk.Label(self)
+        self.img_label.pack()
+
+        # Botões de navegação
+        btn_prev = tk.Button(self, text="Anterior", command=self.mostrar_anterior)
+        btn_prev.pack(side="left", padx=20)
+        btn_next = tk.Button(self, text="Próximo", command=self.mostrar_proximo)
+        btn_next.pack(side="right", padx=20)
+
+        # Mostrar a primeira imagem
+        self.mostrar_imagem()
+
+    def mostrar_imagem(self):
+        # Pegar o link do thumbnail atual
+        url = self.parent.lista_thumbs[self.thumb_index]
+
+        # Fazer a requisição da imagem
+        response = requests.get(url)
+        img_data = response.content
+        img = Image.open(BytesIO(img_data))
 
 
-class TelaEspera(tk.Frame):
-    def __init__(self, parent, controller):
-        super().__init__(parent)
-        self.parent = parent
-        self.controller = controller
-        label = tk.Label(self, text="Esperando o treino...")
-        label.pack(pady=10, padx=10)
-    
+        # Atualizar a imagem do Label
+        self.img_tk = ImageTk.PhotoImage(img)
+        self.img_label.config(image=self.img_tk)
+
+    def mostrar_anterior(self):
+        # Vai para a imagem anterior no carrossel
+        if self.thumb_index > 0:
+            self.thumb_index -= 1
+        else:
+            self.thumb_index = len(self.parent.lista_thumbs) - 1  # Volta ao último item
+        self.mostrar_imagem()
+
+    def mostrar_proximo(self):
+        # Vai para a próxima imagem no carrossel
+        if self.thumb_index < len(self.parent.lista_thumbs) - 1:
+            self.thumb_index += 1
+        else:
+            self.thumb_index = 0  # Volta ao primeiro item
+        self.mostrar_imagem()
+
+            
+        
 
 class TelaUsuario(tk.Frame):
     def __init__(self, parent, controller) -> None:
@@ -239,8 +278,18 @@ class TelaUsuario(tk.Frame):
             self.acuracia = accuracy_score(y_test, y_pred)
             self.parent.predicoes = [{'nome': title, 'predicao_curte': pred} for title, pred in zip(titles_test, y_pred)]
             print(self.parent.predicoes)
+            self.parent.lista_thumbs = self.procurar_ids()
             self.controller.show_frame('TelaRecomendado')
 
+
+    def procurar_ids(self):
+        lista_thumbs = []
+        for pred in self.parent.predicoes:
+            if pred['predicao_curte'] == 1:
+                procura = filter(lambda x: x['title'] == pred['nome'], self.parent.dados)
+                thumb = next(procura)['thumbnail']  # Obtém o link thumbnail
+                lista_thumbs.append(thumb)
+        return lista_thumbs
         
 
        
