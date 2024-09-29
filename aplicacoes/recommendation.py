@@ -11,8 +11,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.metrics import accuracy_score
+import numpy as np
 '''
-- Fazer Tela de espera do treinamento
+- Fazer Tela de espera do treinamento v
 - Fazer Tela de listagem de recomendados e não recomendados
 '''
 class App(tk.Tk):
@@ -28,12 +33,15 @@ class App(tk.Tk):
         response = requests.get(self.url_geral)
         dados = response.json()
         self.dados = dados.copy()
-
+        self.modelo_svm = None
+        self.predicoes = None
+        self.accuracia = 0
+        self.criado = False
     # Dicionário para armazenar as telas
         self.frames = {}
 
         # Criar as telas
-        for F in (TelaUsuario,):
+        for F in (TelaUsuario,TelaRecomendado):
             page_name = F.__name__
             frame = F(parent=self, controller=self)
             self.frames[page_name] = frame
@@ -49,13 +57,21 @@ class App(tk.Tk):
 
 
 class TelaRecomendado(tk.Frame):
-    def __init__(self):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.parent = parent
+        self.controller = controller
         pass
 
 
 class TelaEspera(tk.Frame):
-    def __init__(self):
-        pass
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.parent = parent
+        self.controller = controller
+        label = tk.Label(self, text="Esperando o treino...")
+        label.pack(pady=10, padx=10)
+    
 
 class TelaUsuario(tk.Frame):
     def __init__(self, parent, controller) -> None:
@@ -126,6 +142,8 @@ class TelaUsuario(tk.Frame):
         self.dislike = False
         self.like = False
 
+
+
     def atualizar_imagem(self):
         self.photo = ImageTk.PhotoImage(self.image)
         self.label.config(image=self.photo)  # Atualiza a imagem do label
@@ -133,8 +151,8 @@ class TelaUsuario(tk.Frame):
     def on_curtir(self):
         if not self.like and not self.dislike:
             self.dado_atual = self.parent.dados[self.cont].copy()
-            print(self.url_detalhado + f'?id={self.dado_atual["id"]}')
-            response_detalhados = requests.get(self.url_detalhado + f'?id={self.dado_atual["id"]}')
+            print(self.parent.url_detalhado + f'?id={self.dado_atual["id"]}')
+            response_detalhados = requests.get(self.parent.url_detalhado + f'?id={self.dado_atual["id"]}')
             dados_detalhados = response_detalhados.json()
             self.dicionario_curtiu['title'].append(dados_detalhados['title'])
             self.dicionario_curtiu['status'].append( 1 if dados_detalhados['status'] == 'Live' else 0)
@@ -161,8 +179,8 @@ class TelaUsuario(tk.Frame):
 
     def on_nao_curtir(self):
         if not self.dislike and not self.like:
-            self.dado_atual = self.dados[self.cont].copy()
-            response_detalhados = requests.get(self.url_detalhado + f'?id={self.dado_atual["id"]}')
+            self.dado_atual = self.parent.dados[self.cont].copy()
+            response_detalhados = requests.get(self.parent.url_detalhado + f'?id={self.dado_atual["id"]}')
             dados_detalhados = response_detalhados.json()
             self.dicionario_curtiu['title'].append(dados_detalhados['title'])
             self.dicionario_curtiu['status'].append( 1 if dados_detalhados['status'] == 'Live' else 0)
@@ -188,7 +206,40 @@ class TelaUsuario(tk.Frame):
     def on_to_pandas_csv(self):
         df = pd.DataFrame(self.dicionario_curtiu)
         df.to_csv('treino.csv', index=False)
-        self.quit()
+        self.treino()
+
+    def treino(self):
+            print('comecou')
+            df = pd.read_csv('treino2.csv')
+            X = df.drop(['like'], axis=1)  
+            y = df['like']  
+
+            titles = X['title']
+            # Aplicar One-Hot Encoding nas colunas categóricas (genre, platform, publisher)
+            encoder = OneHotEncoder(sparse_output=False)  # Usar sparse_output=False
+            X_encoded = encoder.fit_transform(X[['genre', 'platform', 'publisher']])
+
+            # Transformar X_encoded em DataFrame para combinar com colunas numéricas
+            encoded_columns = encoder.get_feature_names_out(['genre', 'platform', 'publisher'])
+            X_encoded_df = pd.DataFrame(X_encoded, columns=encoded_columns, index=X.index)
+
+            # Concatenar as variáveis categóricas codificadas com as variáveis numéricas (status, age, review)
+            X_numeric = X[['status', 'age', 'review']]
+            X_final = pd.concat([X_numeric, X_encoded_df], axis=1)
+            print(X_final.head())
+            # Dividir os dados em treino (70%) e teste (30%)
+            X_train, X_test, y_train, y_test, titles_train, titles_test = train_test_split(X_final, y, titles, test_size=0.3, random_state=42)
+
+            # Criar e treinar o modelo SVM
+            self.parent.modelo_svm = SVC(kernel='linear')
+            self.parent.modelo_svm.fit(X_train, y_train)
+            print('treino terminado')
+            # Fazer previsões nos dados de teste
+            y_pred = self.parent.modelo_svm.predict(X_test)
+            self.acuracia = accuracy_score(y_test, y_pred)
+            self.parent.predicoes = [{'nome': title, 'predicao_curte': pred} for title, pred in zip(titles_test, y_pred)]
+            print(self.parent.predicoes)
+            self.controller.show_frame('TelaRecomendado')
 
         
 
