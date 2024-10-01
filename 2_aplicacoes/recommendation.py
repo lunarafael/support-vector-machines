@@ -230,7 +230,7 @@ class TelaUsuario(tk.Frame):
 
     def treino(self):
             print('comecou')
-            df = pd.read_csv('treino2.csv')
+            df = pd.read_csv('treino.csv')
             X = df.drop(['like'], axis=1)  
             y = df['like']  
 
