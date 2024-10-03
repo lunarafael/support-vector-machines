@@ -37,7 +37,7 @@ class App(tk.Tk):
         self.predicoes = []
         self.accuracia = 0
         self.criado = False
-        self.lista_thumbs = ['https://www.freetogame.com/g/582/thumbnail.jpg']
+        self.lista_thumbs = []
     # Dicionário para armazenar as telas
         self.frames = {}
 
@@ -76,37 +76,39 @@ class TelaRecomendado(tk.Frame):
         btn_next = tk.Button(self, text="Próximo", command=self.mostrar_proximo)
         btn_next.pack(side="right", padx=20)
 
-        # Mostrar a primeira imagem
-        self.mostrar_imagem()
-
     def mostrar_imagem(self):
         # Pegar o link do thumbnail atual
-        url = self.parent.lista_thumbs[self.thumb_index]
+        if len(self.parent.lista_thumbs) > 0:
+            url = self.parent.lista_thumbs[self.thumb_index]
 
-        # Fazer a requisição da imagem
-        response = requests.get(url)
-        img_data = response.content
-        img = Image.open(BytesIO(img_data))
+            # Fazer a requisição da imagem
+            response = requests.get(url)
+            img_data = response.content
+            img = Image.open(BytesIO(img_data))
 
 
-        # Atualizar a imagem do Label
-        self.img_tk = ImageTk.PhotoImage(img)
-        self.img_label.config(image=self.img_tk)
+            # Atualizar a imagem do Label
+            self.img_tk = ImageTk.PhotoImage(img)
+            self.img_label.config(image=self.img_tk)
 
     def mostrar_anterior(self):
+        print(f'Antigo index: {self.thumb_index}')
         # Vai para a imagem anterior no carrossel
         if self.thumb_index > 0:
             self.thumb_index -= 1
         else:
             self.thumb_index = len(self.parent.lista_thumbs) - 1  # Volta ao último item
+        print(f'Depois index: {self.thumb_index}')
         self.mostrar_imagem()
 
     def mostrar_proximo(self):
+        print(f'Antigo index: {self.thumb_index}')
         # Vai para a próxima imagem no carrossel
         if self.thumb_index < len(self.parent.lista_thumbs) - 1:
             self.thumb_index += 1
         else:
             self.thumb_index = 0  # Volta ao primeiro item
+        print(f'Depois index: {self.thumb_index}')
         self.mostrar_imagem()
 
             
@@ -230,7 +232,7 @@ class TelaUsuario(tk.Frame):
 
     def treino(self):
             print('comecou')
-            df = pd.read_csv('treino2.csv')
+            df = pd.read_csv('treino.csv')
             X = df.drop(['like'], axis=1)  
             y = df['like']  
 
@@ -267,7 +269,7 @@ class TelaUsuario(tk.Frame):
     def procurar_ids(self):
         lista_thumbs = []
         for pred in self.parent.predicoes:
-            if pred['predicao_curte'] == 1:
+            if int(pred['predicao_curte']) == 1:
                 procura = filter(lambda x: x['title'] == pred['nome'], self.parent.dados)
                 thumb = next(procura)['thumbnail']  # Obtém o link thumbnail
                 lista_thumbs.append(thumb)

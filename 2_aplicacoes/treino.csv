@@ -1,9 +1,4 @@
 title,status,genre,platform,publisher,age,review,like
 Tarisland,1,MMORPG,Windows,Tencent,0,83,1
-Overwatch 2,1,Shooter,Windows,Activision Blizzard,2,88,1
-PUBG: BATTLEGROUNDS,1,Shooter,Windows,"KRAFTON, Inc.",2,77,1
-Enlisted,1,Shooter,Windows,Gaijin Entertainment,3,96,1
-Forge of Empires,1,Strategy,Web Browser,InnoGames,12,58,0
-Genshin Impact,1,Action RPG,Windows,miHoYo,4,90,0
-Fall Guys,1,Battle Royale,Windows,Mediatonic,4,76,0
-Game Of Thrones Winter Is Coming,1,Strategy,Web Browser,GTArcade,5,68,0
+Overwatch 2,1,Shooter,Windows,Activision Blizzard,2,88,0
+PUBG: BATTLEGROUNDS,1,Shooter,Windows,"KRAFTON, Inc.",2,80,1
